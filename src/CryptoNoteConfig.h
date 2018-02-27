@@ -38,6 +38,9 @@ const uint64_t MONEY_SUPPLY                                  = UINT64_C(18446744
 const uint32_t ZAWY_DIFFICULTY_BLOCK_INDEX                 = 0;
 const size_t ZAWY_DIFFICULTY_V2                          = 0;
 const uint8_t ZAWY_DIFFICULTY_DIFFICULTY_BLOCK_VERSION   = 3;
+const size_t MIN_MIXIN                          = 0;
+const uint8_t MANDATORY_MIXIN_BLOCK_VERSION     = 0;
+const uint32_t MIXIN_START_HEIGHT                          = 0;
 const unsigned EMISSION_SPEED_FACTOR                         = 18;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
