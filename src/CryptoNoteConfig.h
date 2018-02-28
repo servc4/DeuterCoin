@@ -38,9 +38,6 @@ const uint64_t MONEY_SUPPLY                                  = UINT64_C(18446744
 const uint32_t ZAWY_DIFFICULTY_BLOCK_INDEX                 = 0;
 const size_t ZAWY_DIFFICULTY_V2                          = 0;
 const uint8_t ZAWY_DIFFICULTY_DIFFICULTY_BLOCK_VERSION   = 3;
-const size_t MIN_MIXIN                          = 0;
-const uint8_t MANDATORY_MIXIN_BLOCK_VERSION     = 0;
-const uint32_t MIXIN_START_HEIGHT                          = 0;
 const unsigned EMISSION_SPEED_FACTOR                         = 18;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
@@ -131,7 +128,7 @@ const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; //
 const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          // 5 seconds
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "4d26c4df7f4ca7037950ad026f9ab36dd05d881952662992f2e4dcfcafbe57eb";
 
-const char* const SEED_NODES[] = { "91.228.197.82:18080", "91.228.197.8:18080", "185.201.112.116:18080", "155.133.24.233:18080", "91.189.36.213:18080", "me4u.co:18080", "servc4.uk:18080", "deutercoin.uk:18080" };
+const char* const SEED_NODES[] = { "91.228.197.82:18080", "91.228.197.8:18080", "185.201.112.7:18080", "155.133.24.233:18080" };
 
 
 struct CheckpointData {
@@ -139,7 +136,16 @@ struct CheckpointData {
   const char* blockId;
 };
 
-const std::initializer_list<CheckpointData> CHECKPOINTS = {  };
+const std::initializer_list<CheckpointData> CHECKPOINTS = { 
+  {1000,  "ae3488432e86698dbf6e2c9a95242c25595cca5df52bfad0623936879c986406"},
+  {4000, "3ea8a554d70f5542acd5d3589ae9f0bfbf5af79e70c8261142449c82270f3942"},
+  {10000, "abdabb855ec47e8f8d119612a2bdec9a277aa5d42e03a0c90d1ecfb26f87015b"},
+  {15580, "86e537f9f1a80e5d113abfcc2f47a11b4baea8c1d8bb2b95018cf59d307e1bfe"},
+  {26000, "761e7974ecbfd8e38adaac9004987adbe9254a2b28cec95eb41b1bccfdef6fe9"},
+  {33000, "59e3719afd10919d06e8be81beb37f8e7c27acda55b5e9bd5d7b2a990769c885"},
+  {42285, "7ddcdacc69ba9ee25a49703c0aaa704f84108fd1718d76b69c1d502421df5434"},
+  {47000, "d6c38e896c561d87ef4822dea1049c7ca13c7890120fcc775405b567f66a4871"}
+ };
 
 } // CryptoNote
 

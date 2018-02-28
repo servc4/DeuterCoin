@@ -718,9 +718,6 @@ m_txPoolFileName(currency.m_txPoolFileName),
 m_zawyDifficultyBlockIndex(currency.m_zawyDifficultyBlockIndex),
 m_zawyDifficultyV2(currency.m_zawyDifficultyV2),
 m_zawyDifficultyBlockVersion(currency.m_zawyDifficultyBlockVersion),
-m_minMixin(currency.m_minMixin),
-m_mandatoryMixinBlockVersion(currency.m_mandatoryMixinBlockVersion),
-m_mixinStartHeight(currency.m_mixinStartHeight),
 m_testnet(currency.m_testnet),
 genesisBlockTemplate(std::move(currency.genesisBlockTemplate)),
 cachedGenesisBlock(new CachedBlock(genesisBlockTemplate)),
@@ -744,9 +741,6 @@ CurrencyBuilder::CurrencyBuilder(Logging::ILogger& log) : m_currency(log) {
 zawyDifficultyBlockIndex(parameters::ZAWY_DIFFICULTY_BLOCK_INDEX);
 zawyDifficultyV2(parameters::ZAWY_DIFFICULTY_V2);
 zawyDifficultyBlockVersion(parameters::ZAWY_DIFFICULTY_DIFFICULTY_BLOCK_VERSION);
-minMixin(parameters::MIN_MIXIN);
-mandatoryMixinBlockVersion(parameters::MANDATORY_MIXIN_BLOCK_VERSION);
-mixinStartHeight(parameters::MIXIN_START_HEIGHT);
   blockGrantedFullRewardZone(parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE);
   minerTxBlobReservedSize(parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE);
 
