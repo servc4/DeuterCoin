@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "Common/CommandLine.h"
 #include "Common/Util.h"
@@ -60,12 +61,14 @@ bool ConfigurationManager::init(int argc, char** argv) {
   
   po::options_description remoteNodeOptions("Remote Node Options");
   RpcNodeConfiguration::initOptions(remoteNodeOptions);
+  po::options_description coinBaseOptions("Coin Base Options");
+  CoinBaseConfiguration::initOptions(coinBaseOptions);
 
   po::options_description cmdOptionsDesc;
   cmdOptionsDesc.add(cmdGeneralOptions).add(remoteNodeOptions).add(netNodeOptions);
 
   po::options_description confOptionsDesc;
-  confOptionsDesc.add(confGeneralOptions).add(remoteNodeOptions).add(netNodeOptions);
+  confOptionsDesc.add(confGeneralOptions).add(remoteNodeOptions).add(netNodeOptions).add(coinBaseOptions);
 
   po::variables_map cmdOptions;
   po::store(po::parse_command_line(argc, argv, cmdOptionsDesc), cmdOptions);
@@ -81,19 +84,26 @@ bool ConfigurationManager::init(int argc, char** argv) {
     return false;
   }
 
+po::variables_map confOptions;
   if (cmdOptions.count("config")) {
     std::ifstream confStream(cmdOptions["config"].as<std::string>(), std::ifstream::in);
     if (!confStream.good()) {
       throw ConfigurationError("Cannot open configuration file");
     }
 
-    po::variables_map confOptions;
-    po::store(po::parse_config_file(confStream, confOptionsDesc), confOptions);
+
+    po::store(po::parse_config_file(confStream, confOptionsDesc, true), confOptions);
     po::notify(confOptions);
 
+    std::string default_data_dir = Tools::getDefaultDataDirectory();
+    if (!coinBaseConfig.CRYPTONOTE_NAME.empty()) {
+      boost::replace_all(default_data_dir, CryptoNote::CRYPTONOTE_NAME, coinBaseConfig.CRYPTONOTE_NAME);
+    }
+    netNodeConfig.setConfigFolder(default_data_dir);
     gateConfiguration.init(confOptions);
     netNodeConfig.init(confOptions);
     remoteNodeConfig.init(confOptions);
+    coinBaseConfig.init(confOptions);
 
     netNodeConfig.setTestnet(confOptions["testnet"].as<bool>());
     startInprocess = confOptions["local"].as<bool>();
@@ -104,6 +114,14 @@ bool ConfigurationManager::init(int argc, char** argv) {
   netNodeConfig.init(cmdOptions);
   remoteNodeConfig.init(cmdOptions);
   dataDir = command_line::get_arg(cmdOptions, command_line::arg_data_dir);
+
+  if (!(cmdOptions["BYTECOIN_NETWORK"].as<std::string>().compare("11100111-1100-0101-1011-001210110110"))) {
+    netNodeConfig.setNetworkId(boost::lexical_cast<boost::uuids::uuid>(confOptions["BYTECOIN_NETWORK"].as<std::string>()));
+  }
+
+  if (!(cmdOptions["P2P_STAT_TRUSTED_PUB_KEY"].as<std::string>().compare(""))) {
+    netNodeConfig.setP2pStatTrustedPubKey(confOptions["P2P_STAT_TRUSTED_PUB_KEY"].as<std::string>());
+  }
 
   if (cmdOptions["testnet"].as<bool>()) {
     netNodeConfig.setTestnet(true);

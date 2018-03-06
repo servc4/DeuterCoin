@@ -20,6 +20,7 @@
 #include "PaymentServiceConfiguration.h"
 #include "P2p/NetNodeConfig.h"
 #include "RpcNodeConfiguration.h"
+#include "CoinBaseConfiguration.h"
 
 namespace PaymentService {
 
@@ -32,6 +33,7 @@ public:
   Configuration gateConfiguration;
   CryptoNote::NetNodeConfig netNodeConfig;
   RpcNodeConfiguration remoteNodeConfig;
+  CoinBaseConfiguration coinBaseConfig;
   std::string dataDir;
 };
 

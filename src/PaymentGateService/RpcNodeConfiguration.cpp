@@ -37,6 +37,9 @@ void RpcNodeConfiguration::init(const boost::program_options::variables_map& opt
     daemonHost = options["daemon-address"].as<std::string>();
   }
 
+  if (options.count("rpc-bind-port") != 0) {
+    daemonPort = options["rpc-bind-port"].as<uint16_t>();
+  }
   if (options.count("daemon-port") != 0 && (!options["daemon-port"].defaulted() || daemonPort == 0)) {
     daemonPort = options["daemon-port"].as<uint16_t>();
   }
