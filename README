@@ -1,8 +1,15 @@
-IMPORTANT ANNOUNCEMENT
+-= Building DeuterCoin =-
 
-Official development moved to https://github.com/bcndev/bytecoin. This repository won't be updated any more.
+Usage
+1) Downloading & Installing
+Clone the repository:
 
--= Building CryptoNote =-
+	git clone https://github.com/servc4/DeuterCoin.git deuter
+	cd deuter
+
+	Install dependencies: ubuntu 16.04
+
+bash install_dependencies.sh
 
 On *nix:
 

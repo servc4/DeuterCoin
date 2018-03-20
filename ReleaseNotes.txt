@@ -1,6 +1,7 @@
 Release notes 2.1.3
 
 - Bug fix
+- Hard Fork
 
 Release notes 2.1.2
 
