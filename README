@@ -3,13 +3,20 @@
 Usage
 1) Downloading & Installing
 Clone the repository:
+Don't forget to change user:user on your username and group...
 
-        git clone https://github.com/servc4/DeuterCoin.git deuter
+        git clone https://github.com/servc4/DeuterCoin.git
+        chown user:user DeuterCoin -R
+        chmod 777 DeuterCoin -R
         cd deuter
 
-        Install dependencies: ubuntu 16.04
+Install dependencies: ubuntu 16.04
 
-bash install_dependencies.sh
+        bash install_dependencies.sh
+        
+To build just run `make'.
+Parallel build: run `make -j<number of threads>' instead of `make'.
+
 
 On *nix:
 
@@ -29,7 +36,7 @@ Test suite: run `make test-release' to run tests in addition to building. Runnin
 Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run `export CC=clang CXX=clang++' before running `make'.
 
 On Windows:
-Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.58. You may download them from:
+Dependencies: MSVC 2015 or later, CMake 2.8.6 or later, and Boost 1.58. You may download them from:
 http://www.microsoft.com/
 http://www.cmake.org/
 http://www.boost.org/
