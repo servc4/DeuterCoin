@@ -7,7 +7,7 @@ Don't forget to change user:user on your username and group...
 
         git clone https://github.com/servc4/DeuterCoin.git
         chown user:user DeuterCoin -R
-        chmod 777 DeuterCoin -R
+        chmod 755 DeuterCoin -R
         cd deuter
 
 Install dependencies: ubuntu 16.04
