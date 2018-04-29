@@ -74,8 +74,6 @@ const command_line::arg_descriptor<std::string> arg_daemon_host = { "daemon-host
 const command_line::arg_descriptor<std::string> arg_password = { "password", "Wallet password", "", true };
 const command_line::arg_descriptor<uint16_t> arg_daemon_port = { "daemon-port", "Use daemon instance at port <arg> instead of 18081", 0 };
 const command_line::arg_descriptor<uint32_t> arg_log_level = { "set_log", "", INFO, true };
-  const command_line::arg_descriptor<uint64_t> arg_DEFAULT_FEE  = {"DEFAULT_FEE", "Default fee", CryptoNote::parameters::DEFAULT_FEE};  
-  const command_line::arg_descriptor<bool>      arg_SYNC_FROM_ZERO  = {"SYNC_FROM_ZERO", "Sync from block 0. Use for premine wallet or brainwallet", false};
 const command_line::arg_descriptor<bool> arg_testnet = { "testnet", "Used to deploy test nets. The daemon must be launched with --testnet flag", false };
 const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
 
@@ -152,8 +150,8 @@ struct TransferCommand {
   std::vector<uint8_t> extra;
   uint64_t fee;
 
-  TransferCommand(const CryptoNote::Currency& currency, uint64_t default_fee) :
-    m_currency(currency), fake_outs_count(0), fee(default_fee) {
+  TransferCommand(const CryptoNote::Currency& currency) :
+    m_currency(currency), fake_outs_count(0), fee(currency.minimumFee()) {
   }
 
   bool parseArguments(LoggerRef& logger, const std::vector<std::string> &args) {
@@ -168,11 +166,6 @@ struct TransferCommand {
         logger(ERROR, BRIGHT_RED) << "mixin_count should be non-negative integer, got " << mixin_str;
         return false;
       }
-
-              if (fake_outs_count < m_currency.minMixin()) {
-                logger(ERROR, BRIGHT_RED) << "mixin should be equal or bigger to " << m_currency.minMixin();
-                return false;
-              }
 
       while (!ar.eof()) {
 
@@ -570,7 +563,6 @@ if (!(c == 'O' || c == 'G' || c == 'E' || c == 'I' || c == 'M' || c == 'o' || c 
   }
 
   std::string walletFileName;
-  sync_from_zero = command_line::get_arg(vm, arg_SYNC_FROM_ZERO);
     if (!m_generate_new.empty() || !m_import_new.empty()) {
     std::string ignoredString;
     if (!m_generate_new.empty()) {
@@ -622,7 +614,6 @@ if (!(c == 'O' || c == 'G' || c == 'E' || c == 'I' || c == 'M' || c == 'o' || c 
     return false;
   }
 
-  sync_from_zero = command_line::get_arg(vm, arg_SYNC_FROM_ZERO);
   if (!m_generate_new.empty()) {
     std::string walletAddressFile = prepareWalletAddressFilename(m_generate_new);
     boost::system::error_code ignore;
@@ -707,7 +698,6 @@ if (key_import) {
     m_wallet.reset(new WalletLegacy(m_currency, *m_node));
 
 
-    m_wallet->syncAll(sync_from_zero);
 
     try {
       m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(logger, m_wallet, m_wallet_file_arg, pwd_container.password());
@@ -834,10 +824,6 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
   m_daemon_address = command_line::get_arg(vm, arg_daemon_address);
   m_daemon_host = command_line::get_arg(vm, arg_daemon_host);
   m_daemon_port = command_line::get_arg(vm, arg_daemon_port);
-m_default_fee = command_line::get_arg(vm, arg_DEFAULT_FEE);
-if (m_currency.minimumFee() > m_default_fee) {
-  m_default_fee = m_currency.minimumFee();
-}
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string& password) {
@@ -849,7 +835,6 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
   try {
     m_initResultPromise.reset(new std::promise<std::error_code>());
     std::future<std::error_code> f_initError = m_initResultPromise->get_future();
-    m_wallet->syncAll(sync_from_zero);
     m_wallet->initAndGenerate(password);
     auto initError = f_initError.get();
     m_initResultPromise.reset(nullptr);
@@ -1244,7 +1229,7 @@ bool simple_wallet::show_blockchain_height(const std::vector<std::string>& args)
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::transfer(const std::vector<std::string> &args) {
   try {
-    TransferCommand cmd(m_currency, m_default_fee);
+    TransferCommand cmd(m_currency);
 
     if (!cmd.parseArguments(logger, args))
       return false;
@@ -1343,8 +1328,6 @@ int main(int argc, char* argv[]) {
   command_line::add_arg(desc_params, arg_log_level);
   command_line::add_arg(desc_params, arg_testnet);
   Tools::wallet_rpc_server::init_options(desc_params);
-  command_line::add_arg(desc_params, arg_SYNC_FROM_ZERO);
-  command_line::add_arg(desc_params, arg_DEFAULT_FEE);
 
   po::positional_options_description positional_options;
   positional_options.add(arg_command.name, -1);

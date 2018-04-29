@@ -121,12 +121,10 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/get_transaction_hashes_by_payment_id.bin", { binMethod<COMMAND_RPC_GET_TRANSACTION_HASHES_BY_PAYMENT_ID>(&RpcServer::onGetTransactionHashesByPaymentId), false } },
 
   // json handlers
-{ "/getrandom_outs", { jsonMethod<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON>(&RpcServer::on_get_random_outs_json), false } },
   { "/getinfo", { jsonMethod<COMMAND_RPC_GET_INFO>(&RpcServer::on_get_info), true } },
   { "/getheight", { jsonMethod<COMMAND_RPC_GET_HEIGHT>(&RpcServer::on_get_height), true } },
   { "/gettransactions", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS>(&RpcServer::on_get_transactions), false } },
   { "/sendrawtransaction", { jsonMethod<COMMAND_RPC_SEND_RAW_TX>(&RpcServer::on_send_raw_tx), false } },
-  { "/feeaddress", { jsonMethod<COMMAND_RPC_GET_FEE_ADDRESS>(&RpcServer::on_get_fee_address), true } },
   { "/stop_daemon", { jsonMethod<COMMAND_RPC_STOP_DAEMON>(&RpcServer::on_stop_daemon), true } },
 
   // json rpc
@@ -219,11 +217,6 @@ bool RpcServer::enableCors(const std::vector<std::string> domains) {
   return true;
 }
 
-bool RpcServer::setFeeAddress(const std::string fee_address) {
-  m_fee_address = fee_address;
-  return true;
-}
-
 bool RpcServer::isCoreReady() {
   return m_core.getCurrency().isTestnet() || m_p2p.get_payload_object().isSynchronized();
 }
@@ -303,31 +296,6 @@ bool RpcServer::on_get_indexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::
   res.o_indexes.assign(outputIndexes.begin(), outputIndexes.end());
   res.status = CORE_RPC_STATUS_OK;
   logger(TRACE) << "COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES: [" << res.o_indexes.size() << "]";
-  return true;
-}
-
-bool RpcServer::on_get_random_outs_json(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON::request& req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON::response& res) {
-  res.status = "Failed";
-
-  for (uint64_t amount : req.amounts) {
-    std::vector<uint32_t> globalIndexes;
-    std::vector<Crypto::PublicKey> publicKeys;
-    if (!m_core.getRandomOutputs(amount, static_cast<uint16_t>(req.outs_count), globalIndexes, publicKeys)) {
-      return true;
-    }
-
-    assert(globalIndexes.size() == publicKeys.size());
-    res.outs.emplace_back(COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_outs_for_amount{amount, {}});
-    for (size_t i = 0; i < globalIndexes.size(); ++i) {
-      COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_out_entry out_entry;
-      out_entry.global_amount_index = globalIndexes[i];
-      out_entry.out_key = publicKeys[i];
-      res.outs.back().outs.push_back(out_entry);
-    }
-  }
-
-  res.status = CORE_RPC_STATUS_OK;
-
   return true;
 }
 
@@ -528,24 +496,13 @@ bool RpcServer::on_send_raw_tx(const COMMAND_RPC_SEND_RAW_TX::request& req, COMM
   logger(DEBUGGING) << "transaction " << transactionHash << " came in on_send_raw_tx";
 
   if (!m_core.addTransactionToPool(transactions.back())) {
-    logger(INFO) << "[on_send_raw_tx]: tx verification failed";
+    logger(DEBUGGING) << "[on_send_raw_tx]: tx verification failed";
     res.status = "Failed";
     return true;
   }
 
   m_protocol.relayTransactions(transactions);
   //TODO: make sure that tx has reached other nodes here, probably wait to receive reflections from other nodes
-  res.status = CORE_RPC_STATUS_OK;
-  return true;
-}
-
-bool RpcServer::on_get_fee_address(const COMMAND_RPC_GET_FEE_ADDRESS::request& req, COMMAND_RPC_GET_FEE_ADDRESS::response& res) {
-  if (m_fee_address.empty()) {
-    res.status = "Node's fee address is not set";
-    return false;
-  }
-
-  res.fee_address = m_fee_address;
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }

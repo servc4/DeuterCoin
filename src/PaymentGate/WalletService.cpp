@@ -269,13 +269,6 @@ std::vector<PaymentService::TransactionHashesInBlockRpcInfo> convertTransactions
   return transactionHashes;
 }
 
-void validateMixin(const uint16_t& mixin, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
-  if (mixin < currency.minMixin()) {
-    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin must be equal or bigger to " << currency.minMixin();
-    throw std::system_error(make_error_code(CryptoNote::error::MIXIN_COUNT_TOO_SMALL));
-  }
-}
-
 void validateAddresses(const std::vector<std::string>& addresses, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
   for (const auto& address: addresses) {
     if (!CryptoNote::validateAddress(address, currency)) {
@@ -330,13 +323,7 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
   log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new wallet";
 
   wallet->initialize(conf.walletFile, conf.walletPassword);
-  std::string address;
-  if (conf.syncFromZero) {
-    CryptoNote::KeyPair spendKey;
-    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
-    address = wallet->createAddress(spendKey.secretKey);
-  } else
-    address = wallet->createAddress();
+  auto address = wallet->createAddress();
 
   log(Logging::INFO, Logging::BRIGHT_WHITE) << "New wallet is generated. Address: " << address;
 
@@ -841,7 +828,6 @@ std::error_code WalletService::sendTransaction(const SendTransaction::Request& r
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
-validateMixin(request.anonymity, currency, logger);
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {
       addPaymentIdToExtra(request.paymentId, sendParams.extra);
@@ -881,7 +867,6 @@ std::error_code WalletService::createDelayedTransaction(const CreateDelayedTrans
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
-validateMixin(request.anonymity, currency, logger);
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {
       addPaymentIdToExtra(request.paymentId, sendParams.extra);

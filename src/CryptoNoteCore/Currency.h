@@ -45,16 +45,8 @@ public:
 
   uint64_t moneySupply() const { return m_moneySupply; }
   unsigned int emissionSpeedFactor() const { return m_emissionSpeedFactor; }
-  uint64_t genesisBlockReward() const { return m_genesisBlockReward; }
-  size_t cryptonoteCoinVersion() const { return m_cryptonoteCoinVersion; }
 
   size_t rewardBlocksWindow() const { return m_rewardBlocksWindow; }
-  size_t minMixin() const { return m_minMixin; }
-  uint8_t mandatoryMixinBlockVersion() const { return m_mandatoryMixinBlockVersion; }
-  uint32_t mixinStartHeight() const { return m_mixinStartHeight; }
-  uint32_t mandatoryTransaction() const { return m_mandatoryTransaction; }
-  uint32_t killHeight() const { return m_killHeight; }
-  uint64_t tailEmissionReward() const { return m_tailEmissionReward; }
   uint32_t zawyDifficultyBlockIndex() const { return m_zawyDifficultyBlockIndex; }
   uint32_t zawyDifficultyLastBlock() const { return m_zawyDifficultyLastBlock; }
   uint32_t zawyLWMADifficultyBlockIndex() const { return m_zawyLWMADifficultyBlockIndex; }
@@ -64,7 +56,6 @@ public:
   size_t blockGrantedFullRewardZone() const { return m_blockGrantedFullRewardZone; }
   size_t blockGrantedFullRewardZoneByBlockVersion(uint8_t blockMajorVersion) const;
   size_t minerTxBlobReservedSize() const { return m_minerTxBlobReservedSize; }
-  uint64_t maxTransactionSizeLimit() const { return m_maxTransactionSizeLimit; }
 
   size_t numberOfDecimalPlaces() const { return m_numberOfDecimalPlaces; }
   uint64_t coin() const { return m_coin; }
@@ -170,16 +161,8 @@ private:
 
   uint64_t m_moneySupply;
   unsigned int m_emissionSpeedFactor;
-  uint64_t m_genesisBlockReward;
-  size_t m_cryptonoteCoinVersion;
 
   size_t m_rewardBlocksWindow;
-  size_t m_minMixin;
-  uint8_t m_mandatoryMixinBlockVersion;
-  uint32_t m_mixinStartHeight;
-  uint32_t m_mandatoryTransaction;
-  uint32_t m_killHeight;
-  uint64_t m_tailEmissionReward;
   uint32_t m_zawyDifficultyBlockIndex;
   uint32_t m_zawyDifficultyLastBlock;
   uint32_t m_zawyLWMADifficultyBlockIndex;
@@ -188,7 +171,6 @@ private:
   uint32_t m_buggedZawyDifficultyBlockIndex;
   size_t m_blockGrantedFullRewardZone;
   size_t m_minerTxBlobReservedSize;
-  uint64_t m_maxTransactionSizeLimit;
 
   size_t m_numberOfDecimalPlaces;
   uint64_t m_coin;
@@ -219,6 +201,7 @@ private:
   uint32_t m_upgradeHeightV2;
   uint32_t m_upgradeHeightV3;
   uint32_t m_upgradeHeightV4;
+  uint32_t m_upgradeHeightV5;
   unsigned int m_upgradeVotingThreshold;
   uint32_t m_upgradeVotingWindow;
   uint32_t m_upgradeWindow;
@@ -253,7 +236,6 @@ public:
   }
 
   Transaction generateGenesisTransaction();
-  Transaction generateGenesisTransaction(const std::vector<AccountPublicAddress>& targets);
   CurrencyBuilder& maxBlockNumber(uint32_t val) { m_currency.m_maxBlockHeight = val; return *this; }
   CurrencyBuilder& maxBlockBlobSize(size_t val) { m_currency.m_maxBlockBlobSize = val; return *this; }
   CurrencyBuilder& maxTxSize(size_t val) { m_currency.m_maxTxSize = val; return *this; }
@@ -265,16 +247,8 @@ public:
 
   CurrencyBuilder& moneySupply(uint64_t val) { m_currency.m_moneySupply = val; return *this; }
   CurrencyBuilder& emissionSpeedFactor(unsigned int val);
-  CurrencyBuilder& genesisBlockReward(uint64_t val) { m_currency.m_genesisBlockReward = val; return *this; }
-  CurrencyBuilder& cryptonoteCoinVersion(size_t val) { m_currency.m_cryptonoteCoinVersion = val; return *this; }
 
   CurrencyBuilder& rewardBlocksWindow(size_t val) { m_currency.m_rewardBlocksWindow = val; return *this; }
-  CurrencyBuilder& minMixin(size_t val) { m_currency.m_minMixin = val; return *this; }
-  CurrencyBuilder& mandatoryMixinBlockVersion(uint8_t val) { m_currency.m_mandatoryMixinBlockVersion = val; return *this; }
-  CurrencyBuilder& mixinStartHeight(uint32_t val) { m_currency.m_mixinStartHeight = val; return *this; }
-  CurrencyBuilder& mandatoryTransaction(uint8_t val) { m_currency.m_mandatoryTransaction = val; return *this; }
-  CurrencyBuilder& killHeight(uint32_t val) { m_currency.m_killHeight = val; return *this; }
-  CurrencyBuilder& tailEmissionReward(uint64_t val) { m_currency.m_tailEmissionReward = val; return *this; }
   CurrencyBuilder& zawyDifficultyBlockIndex(uint32_t val) { m_currency.m_zawyDifficultyBlockIndex = val; return *this; }
   CurrencyBuilder& zawyDifficultyLastBlock(uint32_t val) { m_currency.m_zawyDifficultyLastBlock = val; return *this; }
   CurrencyBuilder& zawyLWMADifficultyBlockIndex(uint32_t val) { m_currency.m_zawyLWMADifficultyBlockIndex = val; return *this; }
@@ -283,7 +257,6 @@ public:
   CurrencyBuilder& buggedZawyDifficultyBlockIndex(uint32_t val) { m_currency.m_buggedZawyDifficultyBlockIndex = val; return *this; }
   CurrencyBuilder& blockGrantedFullRewardZone(size_t val) { m_currency.m_blockGrantedFullRewardZone = val; return *this; }
   CurrencyBuilder& minerTxBlobReservedSize(size_t val) { m_currency.m_minerTxBlobReservedSize = val; return *this; }
-  CurrencyBuilder& maxTransactionSizeLimit(uint64_t val) { m_currency.m_maxTransactionSizeLimit = val; return *this; }
 
   CurrencyBuilder& numberOfDecimalPlaces(size_t val);
 
@@ -313,6 +286,7 @@ public:
   CurrencyBuilder& upgradeHeightV2(uint32_t val) { m_currency.m_upgradeHeightV2 = val; return *this; }
   CurrencyBuilder& upgradeHeightV3(uint32_t val) { m_currency.m_upgradeHeightV3 = val; return *this; }
   CurrencyBuilder& upgradeHeightV4(uint32_t val) { m_currency.m_upgradeHeightV4 = val; return *this; }
+  CurrencyBuilder& upgradeHeightV5(uint32_t val) { m_currency.m_upgradeHeightV5 = val; return *this; }
   CurrencyBuilder& upgradeVotingThreshold(unsigned int val);
   CurrencyBuilder& upgradeVotingWindow(uint32_t val) { m_currency.m_upgradeVotingWindow = val; return *this; }
   CurrencyBuilder& upgradeWindow(uint32_t val);

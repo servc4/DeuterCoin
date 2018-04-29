@@ -65,9 +65,7 @@ namespace
   const command_line::arg_descriptor<std::string> arg_log_file    = {"log-file", "", ""};
   const command_line::arg_descriptor<int>         arg_log_level   = {"log-level", "", 2}; // info level
   const command_line::arg_descriptor<bool>        arg_console     = {"no-console", "Disable daemon console commands"};
-  const command_line::arg_descriptor<std::string> arg_set_fee_address = { "fee-address", "Sets fee address for light wallets to the daemon's RPC responses.", "" };
   const command_line::arg_descriptor<bool>        arg_print_genesis_tx = { "print-genesis-tx", "Prints genesis' block tx hex to insert it to config and exits" };
-  const command_line::arg_descriptor<std::vector<std::string>> arg_genesis_block_reward_address = { "genesis-block-reward-address", "" };
   const command_line::arg_descriptor<bool> arg_blockexplorer_on = {"enable-blockexplorer", "Enable blockchain explorer RPC", false};
   const command_line::arg_descriptor<std::vector<std::string>>        arg_enable_cors = { "enable-cors", "Adds header 'Access-Control-Allow-Origin' to the daemon's RPC responses. Uses the value as domain. Use * for all" };
   const command_line::arg_descriptor<bool>        arg_testnet_on  = {"testnet", "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
@@ -76,35 +74,10 @@ namespace
 
 bool command_line_preprocessor(const boost::program_options::variables_map& vm, LoggerRef& logger);
 void print_genesis_tx_hex(const po::variables_map& vm, LoggerManager& logManager) {
-  std::vector<CryptoNote::AccountPublicAddress> targets;
-  auto genesis_block_reward_addresses = command_line::get_arg(vm, arg_genesis_block_reward_address);
-  CryptoNote::CurrencyBuilder currencyBuilder(logManager);
-bool blockexplorer_mode = command_line::get_arg(vm, arg_blockexplorer_on);
-currencyBuilder.isBlockexplorer(blockexplorer_mode);
-  CryptoNote::Currency currency = currencyBuilder.currency();
-  for (const auto& address_string : genesis_block_reward_addresses) {
-     CryptoNote::AccountPublicAddress address;
-    if (!currency.parseAccountAddressString(address_string, address)) {
-      std::cout << "Failed to parse address: " << address_string << std::endl;
-      return;
-    }
-    targets.emplace_back(std::move(address));
-  }
-  if (targets.empty()) {
-    if (CryptoNote::parameters::GENESIS_BLOCK_REWARD > 0) {
-      std::cout << "Error: genesis block reward addresses are not defined" << std::endl;
-    } else {
   CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction();
   std::string tx_hex = Common::toHex(CryptoNote::toBinaryArray(tx));
   std::cout << "Add this line into your coin configuration file as is: " << std::endl;
   std::cout << "\"GENESIS_COINBASE_TX_HEX\":\"" << tx_hex << "\"," << std::endl;
-    }
-  } else {
-      CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction(targets);
-      std::string tx_hex = Common::toHex(CryptoNote::toBinaryArray(tx));
-      std::cout << "Modify this line into your coin configuration file as is: " << std::endl;
-      std::cout << "\"GENESIS_COINBASE_TX_HEX\":\"" << tx_hex << "\"," << std::endl;
-  }
   return;
 }
 
@@ -151,12 +124,10 @@ int main(int argc, char* argv[])
     command_line::add_arg(desc_cmd_sett, arg_log_file);
     command_line::add_arg(desc_cmd_sett, arg_log_level);
     command_line::add_arg(desc_cmd_sett, arg_console);
-    command_line::add_arg(desc_cmd_sett, arg_set_fee_address);
     command_line::add_arg(desc_cmd_sett, arg_testnet_on);
 command_line::add_arg(desc_cmd_sett, arg_enable_cors);
     command_line::add_arg(desc_cmd_sett, arg_blockexplorer_on);
 command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
-  command_line::add_arg(desc_cmd_sett, arg_genesis_block_reward_address);
 
     RpcServerConfig::initOptions(desc_cmd_sett);
     NetNodeConfig::initOptions(desc_cmd_sett);
@@ -319,7 +290,6 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
 
     logger(INFO) << "Starting core rpc server on address " << rpcConfig.getBindAddress();
     rpcServer.start(rpcConfig.bindIp, rpcConfig.bindPort);
-  rpcServer.setFeeAddress(command_line::get_arg(vm, arg_set_fee_address));
 rpcServer.enableCors(command_line::get_arg(vm, arg_enable_cors));
     logger(INFO) << "Core rpc server started ok";
 

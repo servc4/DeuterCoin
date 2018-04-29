@@ -173,55 +173,6 @@ struct COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES {
   };
 };
 //-----------------------------------------------
-struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_request {
-  std::vector<uint64_t> amounts;
-  uint16_t outs_count;
-
-  void serialize(ISerializer &s) {
-    KV_MEMBER(amounts)
-    KV_MEMBER(outs_count)
-  }
-};
-
-struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_out_entry {
-  uint32_t global_amount_index;
-  Crypto::PublicKey out_key;
-  void serialize(ISerializer &s) {
-    KV_MEMBER(global_amount_index)
-    KV_MEMBER(out_key)
-  }
-};
-
-struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_outs_for_amount {
-  uint64_t amount;
-  std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_out_entry> outs;
-
-  void serialize(ISerializer &s) {
-    KV_MEMBER(amount)
-    KV_MEMBER(outs)
-  }
-};
-
-struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_response {
-  std::vector<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_outs_for_amount> outs;
-  std::string status;
-
-  void serialize(ISerializer &s) {
-    KV_MEMBER(outs)
-    KV_MEMBER(status)
-  }
-};
-
-struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON {
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_request request;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_response response;
-
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_out_entry out_entry;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_JSON_outs_for_amount outs_for_amount;
-};
-
-//-----------------------------------------------
-
 struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request {
   std::vector<uint64_t> amounts;
   uint16_t outs_count;
@@ -354,20 +305,6 @@ struct COMMAND_RPC_STOP_DAEMON {
 };
 
 //
-struct COMMAND_RPC_GET_FEE_ADDRESS {
-  typedef EMPTY_STRUCT request;
-
-  struct response {
-    std::string fee_address;
-    std::string status;
-
-    void serialize(ISerializer &s) {
-      KV_MEMBER(fee_address)
-      KV_MEMBER(status)
-    }
-  };
-};
-
 struct COMMAND_RPC_GETBLOCKCOUNT {
   typedef std::vector<std::string> request;
 
